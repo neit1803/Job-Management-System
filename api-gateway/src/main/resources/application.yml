@@ -1,5 +1,5 @@
 server:
-  port: 9000
+  port: ${SERVICE_PORT}
 
 spring:
   application:
@@ -23,6 +23,6 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_SERVER}
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
     register-with-eureka: true
     fetch-registry: true
