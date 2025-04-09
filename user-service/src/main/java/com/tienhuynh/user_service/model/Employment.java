@@ -19,7 +19,7 @@ public class Employment {
     private String position;
 
     @Column(nullable = false)
-    private String empployer;
+    private String employer;
 
     @Column(nullable = false)
     private String city;
