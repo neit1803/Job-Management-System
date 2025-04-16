@@ -15,5 +15,4 @@ public class CandidateProfileDto {
     private List<EducationDto> educationList;
     private List<EmploymentDto> employmentList;
     private List<SkillDto> skillList;
-
 }
