@@ -12,13 +12,8 @@ import java.util.UUID;
 public class UserDto {
     private UUID id;
     private String fullName;
-    private Role role;
     private String mail;
     private String phone;
     private String address;
     private boolean isVerified;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private CandidateProfileDto candidateProfile;
-    private RecruiterProfileDto recruiterProfile;
 }
