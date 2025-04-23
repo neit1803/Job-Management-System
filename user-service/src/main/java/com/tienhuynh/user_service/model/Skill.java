@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Entity
-@Table(name = "Employment")
+@Table(name = "Skill")
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Skill {
     @Id
@@ -19,6 +19,7 @@ public class Skill {
 
     private int level = 1;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cid", nullable = false, unique = true)
     private CandidateProfile cid;
 }
