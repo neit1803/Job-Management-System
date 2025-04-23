@@ -16,7 +16,9 @@ public class RecruiterProfile {
     @Id
     private UUID id;
 
-    @OneToOne(mappedBy = "recruiterProfile")
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "uid",   unique = true,  nullable = false)
     private User user;
 
     @Column(name = "tax_code", nullable = false, unique = true)
