@@ -14,20 +14,19 @@ public class CandidateProfile {
     @Id
     private UUID id;
 
-    @OneToOne(mappedBy = "candidateProfile")
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "uid", unique = true,  nullable = false)
     private User user;
 
     private String resume_url;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cid")
+    @OneToMany(mappedBy = "cid", cascade = CascadeType.ALL)
     private List<Education> educationList;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cid")
+    @OneToMany(mappedBy = "cid", cascade = CascadeType.ALL)
     private List<Employment> employmentList;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cid")
+    @OneToMany(mappedBy = "cid", cascade = CascadeType.ALL)
     private List<Skill> skillList;
 }
