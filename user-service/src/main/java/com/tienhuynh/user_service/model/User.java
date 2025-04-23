@@ -1,18 +1,19 @@
 package com.tienhuynh.user_service.model;
 
-import com.tienhuynh.user_service.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import com.tienhuynh.user_service.enums.Role;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 
 @Entity
-@Table(name = "User")
-@Data @NoArgsConstructor @AllArgsConstructor
+@Table(name = "users")
+@NoArgsConstructor @AllArgsConstructor @Getter @Setter @ToString
 public class User {
     @Id
+    @GeneratedValue
     private UUID id;
 
     @Column(name = "pwd_hash", nullable = false)
@@ -23,7 +24,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private Role role = Role.ROLE_CANDIDATE;
 
     @Column(nullable = false, unique = true)
     private String mail;
@@ -36,19 +37,15 @@ public class User {
     @Column(name = "is_verified", nullable = false)
     private boolean isVerified = false;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cid")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private CandidateProfile candidateProfile;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "rid")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private RecruiterProfile recruiterProfile;
 
     @PrePersist
