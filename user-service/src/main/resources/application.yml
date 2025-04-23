@@ -8,6 +8,7 @@ spring:
     url: ${SPRING_DATASOURCES_URL}
     username: ${SPRING_DATASOURCES_USERNAME}
     password: ${SPRING_DATASOURCES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
     database: POSTGRESQL
     hibernate:
@@ -16,7 +17,8 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+#        dialect: org.hibernate.dialect.PostgreSQLDialect
+    generate-ddl: true
 
 
 eureka:
