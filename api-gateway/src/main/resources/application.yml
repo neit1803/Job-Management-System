@@ -10,9 +10,9 @@ spring:
         - id: user-service
           uri: ${USER_SERVICE_URI}
           predicates:
-            - Path=/api/v1/users/**
-      default-filters:
-        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+            - Path=/users/**
+#      default-filters:
+#        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
       globalcors:
         corsConfigurations:
           '[/**]':
