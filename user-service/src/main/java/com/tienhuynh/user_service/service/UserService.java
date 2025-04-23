@@ -1,13 +1,14 @@
 package com.tienhuynh.user_service.service;
 
+import com.tienhuynh.user_service.dto.UserDto;
 import com.tienhuynh.user_service.model.User;
 
 import java.util.UUID;
 
 public interface UserService {
-    Iterable<User> getAllUsers();
+    Iterable<UserDto> getAllUsers();
 
-    User getUser(UUID id);
+    UserDto getUser(UUID id);
 
-    User save(User user);
+    UserDto save(User user);
 }
