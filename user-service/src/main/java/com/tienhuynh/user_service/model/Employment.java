@@ -33,6 +33,7 @@ public class Employment {
 
     private String description;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "cid", nullable = false, unique = true)
     private CandidateProfile cid;
 }
