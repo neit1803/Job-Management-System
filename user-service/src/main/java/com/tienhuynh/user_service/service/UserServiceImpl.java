@@ -43,10 +43,19 @@ public class UserServiceImpl implements UserService {
         return mapper.apply(user);
     }
 
-    public UserDto update(UUID id, UserDto userDto) {
+    @Override
+    public UserDto update(UUID id, User user) {
         return userRepository.
                 findById(id)
                 .map(mapper)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
+
+    @Override
+    public UserDto changePassword(UUID id, String password) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        user.setPwdHash(password);
+        userRepository.save(user);
+        return mapper.apply(user);
     }
 }
