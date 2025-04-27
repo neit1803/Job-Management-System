@@ -11,4 +11,8 @@ public interface UserService {
     UserDto getUser(UUID id);
 
     UserDto save(User user);
+
+    UserDto update(UUID id, User user);
+
+    UserDto changePassword(UUID id, String password);
 }
