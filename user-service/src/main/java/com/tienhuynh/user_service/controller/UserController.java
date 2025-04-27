@@ -24,4 +24,14 @@ public class UserController {
     public ResponseEntity<UserDto> getUserById(@PathVariable String id) {
         return ResponseEntity.ok(userService.getUser(UUID.fromString(id)));
     }
+
+    @PostMapping
+    public ResponseEntity<UserDto> saveUser(@RequestBody User user) {
+        return ResponseEntity.ok(userService.save(user));
+    }
+
+    @PatchMapping
+    public ResponseEntity<UserDto> updateUser(@PathVariable String id, @RequestBody User user) {
+        return ResponseEntity.ok(userService.update(UUID.fromString(id), user));
+    }
 }
