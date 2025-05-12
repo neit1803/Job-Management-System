@@ -34,6 +34,8 @@ public class User {
 
     private String address;
 
+    private boolean gender = true;
+
     @Column(name = "is_verified", nullable = false)
     private boolean isVerified = false;
 
