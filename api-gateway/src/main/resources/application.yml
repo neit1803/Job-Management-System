@@ -11,6 +11,11 @@ spring:
           uri: ${USER_SERVICE_URI}
           predicates:
             - Path=/users/**
+
+        - id: auth-service
+          uri: ${AUTH_SERVICE_URI}
+          predicates:
+            - Path=/auth/**
 #      default-filters:
 #        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
       globalcors:
