@@ -22,7 +22,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDto> getUserById(@PathVariable String id) {
-        return ResponseEntity.ok(userService.getUser(UUID.fromString(id)));
+        return ResponseEntity.ok(userService.getUserById(UUID.fromString(id)));
     }
 
     @PostMapping

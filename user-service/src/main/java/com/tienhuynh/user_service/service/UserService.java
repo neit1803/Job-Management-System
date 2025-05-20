@@ -8,11 +8,13 @@ import java.util.UUID;
 public interface UserService {
     Iterable<UserDto> getAllUsers();
 
-    UserDto getUser(UUID id);
+    UserDto getUserById(UUID id);
 
     UserDto save(User user);
 
     UserDto update(UUID id, User user);
+
+    User getUserByMail(String email);
 
     UserDto changePassword(UUID id, String password);
 }

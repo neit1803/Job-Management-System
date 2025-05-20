@@ -4,6 +4,11 @@ server:
 spring:
   application:
     name: user-service
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
   datasource:
     url: ${SPRING_DATASOURCES_URL}
     username: ${SPRING_DATASOURCES_USERNAME}

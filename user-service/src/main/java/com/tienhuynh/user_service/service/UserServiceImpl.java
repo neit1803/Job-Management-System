@@ -30,11 +30,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUser(UUID id) {
-        return userRepository
-                .findById(id)
-                .map(mapper)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+    public UserDto getUserById(UUID id) {
+        User user = userRepository.getUserById(id);
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        return mapper.apply(user);
+    }
+
+    @Override
+    public User getUserByMail(String mail) {
+        User user = userRepository.getUserByMail(mail);
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        return user;
     }
 
     @Override
