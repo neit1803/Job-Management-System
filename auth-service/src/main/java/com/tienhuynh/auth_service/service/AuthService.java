@@ -31,7 +31,7 @@ public class AuthService {
         UserDTO user = jsonObjectMapper.convertValue(resp, UserDTO.class);
 
         if (user == null || !passwordEncoder.matches(req.getPassword(), user.getEncodedPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            return "Invalid credentials";
         }
 
         String accessToken = jwtUtil.generateAccessToken(user.getMail(), user.getRole());
