@@ -1,6 +1,9 @@
 server:
   port: ${SERVICE_PORT}
 
+jwt:
+  secret: w4e7R3Fksdf9uA8JLzj23A0TQLsdfj234n98sdfasdfasdf23==
+
 spring:
   application:
     name: auth-service
