@@ -1,11 +1,17 @@
 package com.tienhuynh.user_service.rabbitmq;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tienhuynh.user_service.enums.Role;
+import com.tienhuynh.user_service.model.CandidateProfile;
+import com.tienhuynh.user_service.model.RecruiterProfile;
+import com.tienhuynh.user_service.model.RegisterRequest;
 import com.tienhuynh.user_service.model.User;
 import com.tienhuynh.user_service.service.UserServiceImpl;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 @Component
 public class RabbitMQConsumer {
@@ -17,13 +23,43 @@ public class RabbitMQConsumer {
 
     @RabbitListener(queues = "user.save.request.queue")
     public String handleRegisterRequest(String msg) {
-        return msg;
+        try {
+            // Convert message to DTO
+            RegisterRequest request = jsonObjectMapper.readValue(msg, RegisterRequest.class);
+
+            // Convert DTO to User entity
+            User user = jsonObjectMapper.convertValue(request, User.class);
+            user.setRole(Role.valueOf(request.getRole().toUpperCase()));
+
+            // Convert profile
+            if (user.getRole() == Role.RECRUITER) {
+                RecruiterProfile profile = jsonObjectMapper.convertValue(request.getProfile(), RecruiterProfile.class);
+                profile.setUser(user);
+                user.setRecruiterProfile(profile);
+            } else if (user.getRole() == Role.CANDIDATE) {
+                CandidateProfile profile = jsonObjectMapper.convertValue(request.getProfile(), CandidateProfile.class);
+                profile.setUser(user);
+                user.setCandidateProfile(profile);
+            }
+            userService.save(user).toString();
+            return "SUCCESS";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        }
     }
+
 
     @RabbitListener(queues = "user.get.request.queue")
     public String handleGetUserRequest(String msg) {
-        User user = jsonObjectMapper.convertValue(msg, User.class);
-        User resp = userService.getUserByMail(user.getMail());
-        return jsonObjectMapper.convertValue(resp, String.class);
+        try {
+            User user = jsonObjectMapper.readValue(msg, User.class);
+            User resp = userService.getUserByMail(user.getMail());
+            return jsonObjectMapper.writeValueAsString(resp);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        }
     }
 }

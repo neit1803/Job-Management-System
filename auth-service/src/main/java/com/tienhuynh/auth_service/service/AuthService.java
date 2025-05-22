@@ -30,7 +30,7 @@ public class AuthService {
         String resp = rabbitMQProducer.getUser(req);
         UserDTO user = jsonObjectMapper.convertValue(resp, UserDTO.class);
 
-        if (user == null || !passwordEncoder.matches(req.getPassword(), user.getEncodedPassword())) {
+        if (user == null || !passwordEncoder.matches(req.getPassword(), user.getPwdHash())) {
             return "Invalid credentials";
         }
 
@@ -40,7 +40,7 @@ public class AuthService {
     }
 
     public String register(RegisterRequest req) {
-        req.pwd = passwordEncoder.encode(req.pwd);
+        req.pwd_hash = passwordEncoder.encode(req.pwd_hash);
         return rabbitMQProducer.saveUser(req);
     }
 }

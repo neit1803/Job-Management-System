@@ -3,11 +3,12 @@ package com.tienhuynh.user_service.enums;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public enum Role {
-    CANDIDATE,
-    RECRUITER,
-    ADMIN,
-    SYSTEM;
+public enum RegisterStatus {
+    PENDING_VERIFICATION,
+    VERIFIED,
+    EXPIRED,
+    FAILED,
+    BLACKLISTED;
 
     @JsonCreator
     public static Role fromString(String value) {

@@ -38,7 +38,6 @@ public class RabbitMQProducer   {
 
 
     public String getUser(AuthRequest req) {
-
         try {
             String json = jsonObjectMapper.writeValueAsString(req);
             return (String) rabbitTemplate.convertSendAndReceive(
@@ -50,6 +49,5 @@ public class RabbitMQProducer   {
             log.error("Error serializing AuthRequest object", e);
             return e.getMessage();
         }
-
     }
 }

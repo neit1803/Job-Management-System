@@ -1,18 +1,22 @@
 package com.tienhuynh.user_service.dto;
 
-import lombok.Getter;
+import com.tienhuynh.user_service.model.Education;
+import com.tienhuynh.user_service.model.Employment;
+import com.tienhuynh.user_service.model.Skill;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.List;
 import java.util.UUID;
 
-@Getter @Setter @NoArgsConstructor
-public class CandidateProfileDto {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class CandidateProfileDto implements UserProfileDto{
     private UUID id;
-    private UserDto user;
     private String resume_url;
-    private List<EducationDto> educationList;
-    private List<EmploymentDto> employmentList;
-    private List<SkillDto> skillList;
+    private List<Education> educationList;
+    private List<Employment> employmentList;
+    private List<Skill> skillList;
 }

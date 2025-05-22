@@ -1,5 +1,8 @@
 package com.tienhuynh.user_service.model;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import com.tienhuynh.user_service.enums.RegisterStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import com.tienhuynh.user_service.enums.Role;
@@ -11,6 +14,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 @NoArgsConstructor @AllArgsConstructor @Getter @Setter @ToString
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class User {
     @Id
     @GeneratedValue
@@ -36,8 +40,9 @@ public class User {
 
     private boolean gender = true;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "is_verified", nullable = false)
-    private boolean isVerified = false;
+    private RegisterStatus isVerified = RegisterStatus.PENDING_VERIFICATION;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

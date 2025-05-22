@@ -1,5 +1,6 @@
 package com.tienhuynh.user_service.dto;
 
+import com.tienhuynh.user_service.enums.Role;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 import org.hibernate.validator.constraints.NotBlank;
@@ -7,7 +8,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import java.util.UUID;
 @Data
 @NoArgsConstructor @AllArgsConstructor
-public class UserDto {
+public class UserDto <T extends UserProfileDto>{
     private UUID id;
 
     @NotBlank(message = "Full name is required")
@@ -21,5 +22,8 @@ public class UserDto {
     private String phone;
 
     private String address;
-    private boolean isVerified;
+
+    private Role role;
+
+    private T profile;
 }
