@@ -34,7 +34,7 @@ public class JwtUtil {
 
     // Access token: valid for 1 hour
     public String generateAccessToken(String email, String role) {
-        return generateToken(email, role, 60 * 60 * 1000); // 1 hour
+        return generateToken(email, role, 15 * 60 * 1000); // 15 minutes
     }
 
     // Refresh token: valid for 7 days
