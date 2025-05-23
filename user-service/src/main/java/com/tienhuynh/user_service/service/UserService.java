@@ -17,4 +17,6 @@ public interface UserService {
     User getUserByMail(String email);
 
     UserDto changePassword(UUID id, String password);
+
+    void cleanExpiredUsers();
 }

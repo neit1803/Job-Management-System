@@ -2,13 +2,16 @@ package com.tienhuynh.user_service.service;
 
 import com.tienhuynh.user_service.dto.UserDto;
 import com.tienhuynh.user_service.dto.UserDtoMapper;
+import com.tienhuynh.user_service.enums.RegisterStatus;
 import com.tienhuynh.user_service.exception.UserNotFoundException;
 import com.tienhuynh.user_service.model.User;
 import com.tienhuynh.user_service.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -67,5 +70,11 @@ public class UserServiceImpl implements UserService {
         user.setPwdHash(password);
         userRepository.save(user);
         return mapper.apply(user);
+    }
+
+    @Override
+    @Scheduled(cron = "0 0 3 * * ?") // chạy hàng ngày lúc 3h sáng
+    public void cleanExpiredUsers() {
+        userRepository.deleteAllByIsVerifiedAndCreatedAtBefore(RegisterStatus.EXPIRED, LocalDateTime.now().minusDays(3));
     }
 }

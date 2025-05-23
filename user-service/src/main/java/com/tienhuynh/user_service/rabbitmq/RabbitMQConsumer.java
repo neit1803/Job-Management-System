@@ -24,14 +24,11 @@ public class RabbitMQConsumer {
     @RabbitListener(queues = "user.save.request.queue")
     public String handleRegisterRequest(String msg) {
         try {
-            // Convert message to DTO
             RegisterRequest request = jsonObjectMapper.readValue(msg, RegisterRequest.class);
 
-            // Convert DTO to User entity
             User user = jsonObjectMapper.convertValue(request, User.class);
             user.setRole(Role.valueOf(request.getRole().toUpperCase()));
 
-            // Convert profile
             if (user.getRole() == Role.RECRUITER) {
                 RecruiterProfile profile = jsonObjectMapper.convertValue(request.getProfile(), RecruiterProfile.class);
                 profile.setUser(user);
