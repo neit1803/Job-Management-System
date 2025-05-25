@@ -1,10 +1,10 @@
 package com.tienhuynh.auth_service.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tienhuynh.auth_service.model.AuthRequest;
-import com.tienhuynh.auth_service.model.LoginResponse;
-import com.tienhuynh.auth_service.model.RegisterRequest;
-import com.tienhuynh.auth_service.model.UserDTO;
+import com.tienhuynh.auth_service.payload.AuthRequest;
+import com.tienhuynh.auth_service.payload.LoginResponse;
+import com.tienhuynh.auth_service.payload.RegisterRequest;
+import com.tienhuynh.auth_service.payload.UserDTO;
 import com.tienhuynh.auth_service.rabbitmq.RabbitMQProducer;
 import com.tienhuynh.auth_service.redis.RedisService;
 import com.tienhuynh.auth_service.security.JwtUtil;
@@ -13,9 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor

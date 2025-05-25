@@ -2,9 +2,8 @@ package com.tienhuynh.auth_service.rabbitmq;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tienhuynh.auth_service.model.AuthRequest;
-import com.tienhuynh.auth_service.model.RegisterRequest;
-import com.tienhuynh.auth_service.model.UserDTO;
+import com.tienhuynh.auth_service.payload.AuthRequest;
+import com.tienhuynh.auth_service.payload.RegisterRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;

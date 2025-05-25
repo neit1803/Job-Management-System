@@ -1,4 +1,4 @@
-package com.tienhuynh.auth_service.model;
+package com.tienhuynh.auth_service.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
