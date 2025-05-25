@@ -1,5 +1,6 @@
 package com.tienhuynh.auth_service.security;
 
+import com.tienhuynh.auth_service.redis.RedisService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -9,6 +10,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +28,9 @@ public class JwtUtil {
 
     private Key key;
 
+    public final long ACCESS_TOKEN_EXPIRE_MILLISECOND = 15 * 60 * 1000;
+    public final long REFRESH_TOKEN_EXPIRE_MILLISECOND = 7 * 24 * 60 * 60 * 1000;
+
     @PostConstruct
     public void init() {
         byte[] keyBytes = Decoders.BASE64.decode(secret);
@@ -33,19 +38,19 @@ public class JwtUtil {
     }
 
     // Access token: valid for 1 hour
-    public String generateAccessToken(String email, String role) {
-        return generateToken(email, role, 15 * 60 * 1000); // 15 minutes
+    public String generateAccessToken(String mail, String pwd_hash) {
+        return generateToken(mail, pwd_hash, ACCESS_TOKEN_EXPIRE_MILLISECOND); // 15 minutes
     }
 
     // Refresh token: valid for 7 days
-    public String generateRefreshToken(String email, String role) {
-        return generateToken(email, role, 7 * 24 * 60 * 60 * 1000); // 7 days
+    public String generateRefreshToken(String mail, String pwd_hash) {
+        return generateToken(mail, pwd_hash, REFRESH_TOKEN_EXPIRE_MILLISECOND); // 7 days
     }
 
-    private String generateToken(String email, String role, long expirationMillis) {
+    private String generateToken(String mail, String pwd_hash, long expirationMillis) {
         return Jwts.builder()
-                .setSubject(email)
-                .addClaims(Map.of("role", role))
+                .setSubject(mail)
+                .addClaims(Map.of("pwd_hash", pwd_hash))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
                 .signWith(key, SignatureAlgorithm.HS256)

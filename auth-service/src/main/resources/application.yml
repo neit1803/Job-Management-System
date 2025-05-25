@@ -2,7 +2,11 @@ server:
   port: ${SERVICE_PORT}
 
 jwt:
-  secret: w4e7R3Fksdf9uA8JLzj23A0TQLsdfj234n98sdfasdfasdf23==
+  secret: ${SECRET_KEY}
+
+redis:
+  host: ${REDIS_HOST}
+  port: ${REDIS_PORT}
 
 spring:
   application:
@@ -13,6 +17,9 @@ spring:
     stream:
       username: auth_process
       password: auth_process
+  cache:
+    type: redis
+
 
 eureka:
   client:
