@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByMail(String mail) {
-        User user = userRepository.getUserByMail(mail);
+        User user = userRepository.findByMail(mail);
         if (user == null) {
             throw new UserNotFoundException("User not found");
         }
