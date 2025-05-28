@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
     public User getUserById(UUID id);
-    public User getUserByMail(String email);
+    public User findByMail(String mail);
 
     void deleteAllByIsVerifiedAndCreatedAtBefore(RegisterStatus registerStatus, LocalDateTime localDateTime);
 }
