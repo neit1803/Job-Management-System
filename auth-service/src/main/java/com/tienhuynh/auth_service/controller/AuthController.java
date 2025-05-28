@@ -27,9 +27,9 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(req));
     }
 
-    @PostMapping("/refresh-token")
-    public ResponseEntity refreshToken() {
-        return null;
+    @GetMapping("/refresh-token")
+    public ResponseEntity refreshToken(@RequestHeader("Authorization") String authHeader) {
+        return ResponseEntity.ok(authService.refreshToken(authHeader));
     }
 
     @GetMapping("/logout")

@@ -45,7 +45,6 @@ public class AuthService {
         return ResponseEntity.ok(generateToken(req, "Successfully logged in"));
     }
 
-
     public ResponseEntity register(RegisterRequest req) {
         req.pwd_hash = passwordEncoder.encode(req.pwd_hash);
         String resp = rabbitMQProducer.saveUser(req);
@@ -76,10 +75,9 @@ public class AuthService {
         return ResponseEntity.ok().body("Successfully logged out " + userMail);
     }
 
-
     public LoginResponse generateToken(AuthRequest req, String msg) {
-        String accessToken = jwtUtil.generateAccessToken(req.getMail(), req.getPwd_hash());
-        String refreshToken = jwtUtil.generateRefreshToken(req.getMail(), req.getPwd_hash());
+        String accessToken = jwtUtil.generateAccessToken(req.getMail());
+        String refreshToken = jwtUtil.generateRefreshToken(req.getMail());
         String tokenType = "Bearer";
 
         long expiresIn = jwtUtil.ACCESS_TOKEN_EXPIRE_MILLISECOND;
@@ -87,7 +85,7 @@ public class AuthService {
         redisService.setValue(
                 "refresh_token:" + req.getMail(),
                 refreshToken,
-                jwtUtil.REFRESH_TOKEN_EXPIRE_MILLISECOND
+                jwtUtil.REFRESH_TOKEN_EXPIRE_MILLISECOND / 1000
         );
 
         return new LoginResponse(accessToken, refreshToken, tokenType, expiresIn, msg);
@@ -112,5 +110,29 @@ public class AuthService {
             return ResponseEntity.badRequest().body("Invalid response from user service: " + e.getMessage());
         }
         return ResponseEntity.ok(user);
+    }
+
+    public ResponseEntity refreshToken(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid token");
+        }
+
+        String token = authHeader.split("Bearer ")[1];
+        if (!jwtUtil.isTokenValid(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
+        }
+
+        String userMail = jwtUtil.getEmailFromToken(token);
+        String storedRefreshToken = redisService.getValue("refresh_token:"+userMail).toString();
+
+        if (storedRefreshToken == null || !storedRefreshToken.equals(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token not recognized or revoked");
+        }
+
+        String newAccessToken = jwtUtil.generateAccessToken(userMail);
+        String tokenType = "Bearer";
+        long expiresIn = jwtUtil.ACCESS_TOKEN_EXPIRE_MILLISECOND;
+
+        return ResponseEntity.ok(new LoginResponse(newAccessToken, token, tokenType, expiresIn, "Successfully refreshed token " + userMail));
     }
 }
