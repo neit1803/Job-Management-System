@@ -1,5 +1,7 @@
 package com.tienhuynh.user_service.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.tienhuynh.user_service.enums.RegisterStatus;
@@ -15,6 +17,9 @@ import java.util.UUID;
 @Table(name = "users")
 @NoArgsConstructor @AllArgsConstructor @Getter @Setter @ToString
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class User {
     @Id
     @GeneratedValue
