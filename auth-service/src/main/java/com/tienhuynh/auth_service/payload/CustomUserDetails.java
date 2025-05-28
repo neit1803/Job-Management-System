@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CustomUserDetails implements UserDetails {
-    private UserDTO user;
+    private UserPayload user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -25,7 +25,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return user.getPwdHash();
+        return user.getPwd_Hash();
     }
 
     @Override

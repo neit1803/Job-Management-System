@@ -1,9 +1,10 @@
 package com.tienhuynh.auth_service.controller;
 
-import com.tienhuynh.auth_service.model.AuthRequest;
-import com.tienhuynh.auth_service.model.RegisterRequest;
+import com.tienhuynh.auth_service.payload.AuthRequest;
+import com.tienhuynh.auth_service.payload.RegisterRequest;
 import com.tienhuynh.auth_service.service.AuthService;
 import jakarta.validation.Valid;
+import jakarta.ws.rs.HeaderParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,21 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity register(@Valid @RequestBody RegisterRequest req) {
-        log.info("Register request: {}", req);
         return ResponseEntity.ok(authService.register(req));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity refreshToken() {
+        return null;
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity logout(@RequestHeader("Authorization") String authHeader) {
+        return ResponseEntity.ok(authService.logout(authHeader));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        return ResponseEntity.ok(authService.getEmailFromToken(authHeader));
     }
 }

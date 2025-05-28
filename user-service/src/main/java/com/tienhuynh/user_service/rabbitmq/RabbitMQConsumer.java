@@ -1,17 +1,17 @@
 package com.tienhuynh.user_service.rabbitmq;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tienhuynh.user_service.enums.Role;
 import com.tienhuynh.user_service.model.CandidateProfile;
 import com.tienhuynh.user_service.model.RecruiterProfile;
 import com.tienhuynh.user_service.model.RegisterRequest;
 import com.tienhuynh.user_service.model.User;
+import com.tienhuynh.user_service.payload.CommonResponse;
 import com.tienhuynh.user_service.service.UserServiceImpl;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
 
 @Component
 public class RabbitMQConsumer {
@@ -49,11 +49,11 @@ public class RabbitMQConsumer {
 
 
     @RabbitListener(queues = "user.get.request.queue")
-    public String handleGetUserRequest(String msg) {
+    public String handleGetUserRequest(String msg){
         try {
             User user = jsonObjectMapper.readValue(msg, User.class);
-            User resp = userService.getUserByMail(user.getMail());
-            return jsonObjectMapper.writeValueAsString(resp);
+            User found = userService.getUserByMail(user.getMail());
+            return jsonObjectMapper.writeValueAsString(found);
         } catch (Exception e) {
             e.printStackTrace();
             return "ERROR: " + e.getMessage();

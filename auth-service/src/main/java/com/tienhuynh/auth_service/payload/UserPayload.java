@@ -1,5 +1,7 @@
 package com.tienhuynh.auth_service.payload;
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,13 +12,14 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO implements Serializable {
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+public class UserPayload implements Serializable {
     private String id;
 
     private String mail;
 
     @Column(name = "pwd_hash")
-    private String pwdHash;
+    private String pwd_Hash;
 
     @Column(name = "full_name")
     private String fullName;
