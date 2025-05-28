@@ -70,10 +70,6 @@ public class JwtUtil {
         return getClaims(token).getSubject();
     }
 
-    public String getRoleFromToken(String token) {
-        return getClaims(token).get("role", String.class);
-    }
-
     private Claims getClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(this.key)

@@ -1,14 +1,16 @@
 package com.tienhuynh.auth_service.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tienhuynh.auth_service.dto.UserDTO;
 import com.tienhuynh.auth_service.payload.AuthRequest;
 import com.tienhuynh.auth_service.payload.LoginResponse;
 import com.tienhuynh.auth_service.payload.RegisterRequest;
-import com.tienhuynh.auth_service.payload.UserDTO;
+import com.tienhuynh.auth_service.payload.UserPayload;
 import com.tienhuynh.auth_service.rabbitmq.RabbitMQProducer;
 import com.tienhuynh.auth_service.redis.RedisService;
 import com.tienhuynh.auth_service.security.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +35,16 @@ public class AuthService {
 
     public ResponseEntity login(AuthRequest req) {
         String resp = rabbitMQProducer.getUser(req);
-        UserDTO user = jsonObjectMapper.convertValue(resp, UserDTO.class);
 
-        if (user == null || !passwordEncoder.matches(req.getPwd_hash(), user.getPwdHash())) {
-            return ResponseEntity.badRequest().body("Invalid credentials");
+        UserPayload user;
+        try {
+            user = jsonObjectMapper.readValue(resp, UserPayload.class);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Invalid response from user service: " + e.getMessage());
         }
-        return ResponseEntity.ok(generateToken(new AuthRequest(req.getMail(), req.getPwd_hash()), "Successfully logged in"));
+        return ResponseEntity.ok(generateToken(req, "Successfully logged in"));
     }
+
 
     public ResponseEntity register(RegisterRequest req) {
         req.pwd_hash = passwordEncoder.encode(req.pwd_hash);
@@ -49,6 +54,28 @@ public class AuthService {
         }
         return ResponseEntity.badRequest().body(resp);
     }
+
+    public ResponseEntity logout(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid token");
+        }
+
+        String token = authHeader.split("Bearer ")[1];
+        if (!jwtUtil.isTokenValid(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
+        }
+
+        String userMail = jwtUtil.getEmailFromToken(token);
+        String key = "refresh_token:" + userMail;
+
+        if (!redisService.hasKey(key)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No active session found for user");
+        }
+
+        redisService.deleteValue(key);
+        return ResponseEntity.ok().body("Successfully logged out " + userMail);
+    }
+
 
     public LoginResponse generateToken(AuthRequest req, String msg) {
         String accessToken = jwtUtil.generateAccessToken(req.getMail(), req.getPwd_hash());
@@ -64,5 +91,26 @@ public class AuthService {
         );
 
         return new LoginResponse(accessToken, refreshToken, tokenType, expiresIn, msg);
+    }
+
+    public ResponseEntity getEmailFromToken(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid token");
+        }
+
+        String token = authHeader.split("Bearer ")[1];
+        if (!jwtUtil.isTokenValid(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or expired token");
+        }
+
+        String userMail = jwtUtil.getEmailFromToken(token);
+        String resp = rabbitMQProducer.getUser(new AuthRequest(userMail, ""));
+        UserDTO user;
+        try {
+            user = jsonObjectMapper.readValue(resp, UserDTO.class);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Invalid response from user service: " + e.getMessage());
+        }
+        return ResponseEntity.ok(user);
     }
 }
