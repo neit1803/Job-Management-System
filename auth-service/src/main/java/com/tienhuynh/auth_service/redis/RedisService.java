@@ -14,7 +14,7 @@ public class RedisService {
     }
 
     public void setValue(String key, Object value, long timeoutInSeconds) {
-        redisTemplate.opsForValue().set(key, value, timeoutInSeconds, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(key, value, timeoutInSeconds, TimeUnit.MILLISECONDS);
     }
 
     public Object getValue(String key) {

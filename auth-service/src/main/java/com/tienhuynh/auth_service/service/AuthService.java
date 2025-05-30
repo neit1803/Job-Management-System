@@ -42,14 +42,14 @@ public class AuthService {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Invalid response from user service: " + e.getMessage());
         }
-        return ResponseEntity.ok(generateToken(req, "Successfully logged in"));
+        return ResponseEntity.ok(generateToken(user.getMail(), user.getRole(), "Successfully logged in"));
     }
 
     public ResponseEntity register(RegisterRequest req) {
         req.pwd_hash = passwordEncoder.encode(req.pwd_hash);
         String resp = rabbitMQProducer.saveUser(req);
         if (resp.equals("SUCCESS")) {
-            return ResponseEntity.ok().body(generateToken(new AuthRequest(req.getMail(), req.getPwd_hash()),  "Successfully registered"));
+            return ResponseEntity.ok().body(generateToken(req.getMail(), req.getRole(),  "Successfully registered"));
         }
         return ResponseEntity.badRequest().body(resp);
     }
@@ -75,17 +75,17 @@ public class AuthService {
         return ResponseEntity.ok().body("Successfully logged out " + userMail);
     }
 
-    public LoginResponse generateToken(AuthRequest req, String msg) {
-        String accessToken = jwtUtil.generateAccessToken(req.getMail());
-        String refreshToken = jwtUtil.generateRefreshToken(req.getMail());
+    public LoginResponse generateToken(String mail, String role, String msg) {
+        String accessToken = jwtUtil.generateAccessToken(mail, role);
+        String refreshToken = jwtUtil.generateRefreshToken(mail, role);
         String tokenType = "Bearer";
 
         long expiresIn = jwtUtil.ACCESS_TOKEN_EXPIRE_MILLISECOND;
 
         redisService.setValue(
-                "refresh_token:" + req.getMail(),
+                "refresh_token:" + mail,
                 refreshToken,
-                jwtUtil.REFRESH_TOKEN_EXPIRE_MILLISECOND / 1000
+                jwtUtil.REFRESH_TOKEN_EXPIRE_MILLISECOND
         );
 
         return new LoginResponse(accessToken, refreshToken, tokenType, expiresIn, msg);
@@ -124,12 +124,19 @@ public class AuthService {
 
         String userMail = jwtUtil.getEmailFromToken(token);
         String storedRefreshToken = redisService.getValue("refresh_token:"+userMail).toString();
+        String resp = rabbitMQProducer.getUser(new AuthRequest(userMail, ""));
+        UserDTO user;
+        try {
+            user = jsonObjectMapper.readValue(resp, UserDTO.class);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Invalid response from user service: " + e.getMessage());
+        }
 
         if (storedRefreshToken == null || !storedRefreshToken.equals(token)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token not recognized or revoked");
         }
 
-        String newAccessToken = jwtUtil.generateAccessToken(userMail);
+        String newAccessToken = jwtUtil.generateAccessToken(user.getMail(), user.getRole());
         String tokenType = "Bearer";
         long expiresIn = jwtUtil.ACCESS_TOKEN_EXPIRE_MILLISECOND;
 

@@ -1,8 +1,6 @@
 server:
   port: ${SERVICE_PORT}
 
-jwt:
-  secret: ${SECRET_KEY}
 
 redis:
   host: ${REDIS_HOST}
@@ -17,6 +15,10 @@ spring:
     stream:
       username: auth_process
       password: auth_process
+  jwt:
+    private-key: ${PRIVATE_KEY_PATH}
+    public-key: ${PUBLIC_KEY_PATH}
+
   cache:
     type: redis
 

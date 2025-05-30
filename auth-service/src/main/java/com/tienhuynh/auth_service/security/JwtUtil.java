@@ -4,53 +4,93 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+
 import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
 import java.util.Date;
-import java.util.Map;
 
-@Component
+    @Component
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
 public class JwtUtil {
 
-    @Value("${jwt.secret}")
-    private String secret;
+    @Value("${spring.jwt.private-key}")
+    private String privateKeyPath;
 
-    private Key key;
+    @Value("${spring.jwt.public-key}")
+    private String publicKeyPath;
+
+    private PrivateKey privateKey;
+    private PublicKey publicKey;
 
     public final long ACCESS_TOKEN_EXPIRE_MILLISECOND = 15 * 60 * 1000;
     public final long REFRESH_TOKEN_EXPIRE_MILLISECOND = 7 * 24 * 60 * 60 * 1000;
 
     @PostConstruct
     public void init() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
+        try {
+            this.privateKey = loadPrivateKey(privateKeyPath);
+            this.publicKey = loadPublicKey(publicKeyPath);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to load RSA key pair from PEM files", e);
+        }
     }
 
-    // Access token: valid for 1 hour
-    public String generateAccessToken(String mail) {
-        return generateToken(mail, ACCESS_TOKEN_EXPIRE_MILLISECOND); // 15 minutes
+    private PrivateKey loadPrivateKey(String path) throws Exception {
+        String keyPem = new String(Files.readAllBytes(Paths.get(path)));
+        String privateKeyPEM = keyPem
+                .replace("-----BEGIN PRIVATE KEY-----", "")
+                .replace("-----END PRIVATE KEY-----", "")
+                .replaceAll("\\s", "");
+        byte[] encoded = Base64.getDecoder().decode(privateKeyPEM);
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePrivate(keySpec);
+    }
+
+    private PublicKey loadPublicKey(String path) throws Exception {
+        String keyPem = new String(Files.readAllBytes(Paths.get(path)));
+        String publicKeyPEM = keyPem
+                .replace("-----BEGIN PUBLIC KEY-----", "")
+                .replace("-----END PUBLIC KEY-----", "")
+                .replaceAll("\\s", "");
+        byte[] encoded = Base64.getDecoder().decode(publicKeyPEM);
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+        KeyFactory kf = KeyFactory.getInstance("RSA");
+        return kf.generatePublic(keySpec);
+    }
+
+    // Access token: valid for 15 minutes
+    public String generateAccessToken(String mail, String role) {
+        return generateToken(mail, role, ACCESS_TOKEN_EXPIRE_MILLISECOND); // 15 minutes
     }
 
     // Refresh token: valid for 7 days
-    public String generateRefreshToken(String mail) {
-        return generateToken(mail, REFRESH_TOKEN_EXPIRE_MILLISECOND); // 7 days
+    public String generateRefreshToken(String mail, String role) {
+        return generateToken(mail, role, REFRESH_TOKEN_EXPIRE_MILLISECOND); // 7 days
     }
 
-    private String generateToken(String mail, long expirationMillis) {
+    private String generateToken(String mail, String role, long expirationMillis) {
         return Jwts.builder()
                 .setSubject(mail)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMillis))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .claim("role", role)
+                .signWith(privateKey, SignatureAlgorithm.RS256)
                 .compact();
     }
 
@@ -59,8 +99,9 @@ public class JwtUtil {
             getClaims(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            return false;
+            log.error( e.getMessage());
         }
+        return false;
     }
 
     public String getEmailFromToken(String token) {
@@ -69,7 +110,7 @@ public class JwtUtil {
 
     private Claims getClaims(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(this.key)
+                .setSigningKey(this.publicKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
