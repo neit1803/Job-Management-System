@@ -16,15 +16,11 @@ spring:
           uri: ${AUTH_SERVICE_URI}
           predicates:
             - Path=/auth/**
-#      default-filters:
-#        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
-      globalcors:
-        corsConfigurations:
-          '[/**]':
-            allowedOrigins: "*"
-            allowedMethods: "*"
-            allowedHeaders: "*"
-
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          public-key-location: file:${PUBLIC_KEY_PATH}
 eureka:
   client:
     service-url:
