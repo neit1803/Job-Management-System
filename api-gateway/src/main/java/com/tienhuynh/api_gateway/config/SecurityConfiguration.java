@@ -1,5 +1,8 @@
 package com.tienhuynh.api_gateway.config;
 
+import com.tienhuynh.api_gateway.filters.JwtAuthFilter;
+import org.springframework.cloud.gateway.route.RouteLocator;
+import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -29,5 +32,14 @@ public class SecurityConfiguration {
 
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
         return http.build();
+    }
+
+    @Bean
+    public RouteLocator routes(RouteLocatorBuilder builder, JwtAuthFilter jwtAuthFilter) {
+        return builder.routes()
+                .route("auth-service", r -> r.path("/auth/**")
+                        .filters(f -> f.filter(jwtAuthFilter))
+                        .uri("http://localhost:8081"))
+                .build();
     }
 }
