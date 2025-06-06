@@ -55,10 +55,6 @@ public class AuthService {
     }
 
     public ResponseEntity<?> logout(String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing or invalid token");
-        }
-
         String token = authHeader.split("Bearer ")[1];
 
         String userMail;

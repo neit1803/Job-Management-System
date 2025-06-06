@@ -27,8 +27,8 @@ public class JwtAuthFilter implements GatewayFilter, Ordered {
                         String role = jwt.getClaimAsString("role");
 
                         ServerHttpRequest request = exchange.getRequest().mutate()
-                                .header("X-User-mail", mail)
-                                .header("X-User-role", role)
+                                .header("X-User-Mail", mail)
+                                .header("X-User-Role", role)
                                 .build();
                         return exchange.mutate().request(request).build();
                     }

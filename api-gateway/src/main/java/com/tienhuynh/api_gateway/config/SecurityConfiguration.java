@@ -22,7 +22,11 @@ public class SecurityConfiguration {
     };
 
     @Bean
-    public SecurityWebFilterChain securityFilterChain(ServerHttpSecurity http) throws Exception {
+    public SecurityWebFilterChain securityFilterChain(
+            ServerHttpSecurity http,
+            CustomAuthenticationEntryPoint customEntryPoint,
+            CustomAccessDeniedHandler accessDeniedHandler
+            ) throws Exception {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
@@ -30,7 +34,10 @@ public class SecurityConfiguration {
                         .pathMatchers(HttpMethod.GET, "/users/**").hasAnyRole("ADMIN", "RECRUITER", "SYSTEM")
                         .anyExchange().authenticated()
                 )
-
+                .exceptionHandling(exceptionHandlingSpec -> exceptionHandlingSpec
+                        .authenticationEntryPoint(customEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+                )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
         return http.build();
     }
