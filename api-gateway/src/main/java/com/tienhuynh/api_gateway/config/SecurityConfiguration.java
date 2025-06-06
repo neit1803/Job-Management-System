@@ -1,6 +1,7 @@
 package com.tienhuynh.api_gateway.config;
 
 import com.tienhuynh.api_gateway.filters.JwtAuthFilter;
+import lombok.Value;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +18,7 @@ public class SecurityConfiguration {
     private static final String[] WHITE_LIST_URL = {
             "/auth/login",
             "/auth/register",
-//            "/users/**"
+            "/users/**"
     };
 
     @Bean
@@ -35,11 +36,11 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public RouteLocator routes(RouteLocatorBuilder builder, JwtAuthFilter jwtAuthFilter) {
+    public RouteLocator routes(RouteLocatorBuilder builder, JwtAuthFilter jwtAuthFilter, ServiceUriConfig config) {
         return builder.routes()
-                .route("auth-service", r -> r.path("/auth/**")
+                .route("auth-service", r -> r.path("/auth/refresh-token", "/auth/me", "/auth/logout")
                         .filters(f -> f.filter(jwtAuthFilter))
-                        .uri("http://localhost:8081"))
+                        .uri(config.getAuthServiceUri()))
                 .build();
     }
 }
