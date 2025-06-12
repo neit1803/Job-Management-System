@@ -10,6 +10,7 @@ import org.hibernate.validator.constraints.Length;
 
 
 import java.util.Map;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -34,6 +35,8 @@ public class RegisterRequest {
     public String role;
 
     public String address;
+
+    public String sub =  "";
 
     public Map<String,Object> profile;
 }

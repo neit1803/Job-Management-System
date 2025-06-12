@@ -18,6 +18,39 @@ spring:
   jwt:
     private-key: ${PRIVATE_KEY_PATH}
     public-key: ${PUBLIC_KEY_PATH}
+  security:
+    oauth2:
+      resource-server:
+        jwt:
+          public-key-location: file:${PUBLIC_KEY_PATH}
+      client:
+        registration:
+          google:
+            client-id: 1071147330724-mn4qm6rr76enen1sou5nuh5mnnp9f7c5.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            scope:
+              - openid
+              - profile
+              - email
+          facebook:
+            client-id: 1628784357677864
+            client-secret: 383388b3a71c62bb21f2d609b179d386
+            redirect-uri: "{baseUrl}/login/oauth2/code/facebook"
+            scope:
+              - email
+              - public_profile
+
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+            user-name-attribute: sub
+          facebook:
+            authorization-uri: https://www.facebook.com/v12.0/dialog/oauth
+            token-uri: https://graph.facebook.com/v12.0/oauth/access_token
+            user-info-uri: https://graph.facebook.com/me?fields=id,name,email,picture
 
   cache:
     type: redis

@@ -41,4 +41,5 @@ public class AuthController {
     public ResponseEntity getCurrentUser(@RequestHeader("Authorization") String authHeader) {
         return ResponseEntity.ok(authService.getEmailFromToken(authHeader));
     }
+
 }

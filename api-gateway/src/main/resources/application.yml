@@ -21,6 +21,7 @@ spring:
       resource-server:
         jwt:
           public-key-location: file:${PUBLIC_KEY_PATH}
+
 eureka:
   client:
     service-url:

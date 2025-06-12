@@ -1,7 +1,5 @@
 package com.tienhuynh.api_gateway.config;
 
-import com.tienhuynh.api_gateway.filters.JwtAuthFilter;
-import lombok.Value;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -11,14 +9,17 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import com.tienhuynh.api_gateway.filters.JwtAuthFilter;
 
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfiguration {
     private static final String[] WHITE_LIST_URL = {
-            "/auth/login",
+            "/auth/login/**",
             "/auth/register",
-            "/users/**"
+            "/users/**",
+            "/",
+            "/login/oauth2/code/**"
     };
 
     @Bean
