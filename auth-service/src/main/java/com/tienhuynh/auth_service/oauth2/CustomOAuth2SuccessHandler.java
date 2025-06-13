@@ -29,20 +29,21 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler{
         List<String> callBackUri = List.of(request.getRequestURI().split("/"));
         String registrationId = callBackUri.get(callBackUri.size() - 1).toLowerCase().trim();
 
-        RegisterRequest req;
+        RegisterRequest req = null;
         switch (registrationId) {
             case "google":
                 req = googleOAuthService().fetchUserInfo(oauthUser);
                 break;
                 case "facebook":
-//                    req = facebookOAuthService().fetchUserInfo(oauthUser);
+                    req = facebookOAuthService().fetchUserInfo(oauthUser);
                     break;
             default:
                 response.sendRedirect("http://localhost:3000/oauth2/success?msg=" + "Unsupported Social");
                 break;
         }
+        System.out.println(req.toString());
 
-        System.out.println(oauthUser);
+        
         // Có thể cần mapping giữa userInfo từ từng provider về định dạng chung
         // Gửi thông tin này về AuthService để tạo JWT
 //        String jwt = generateJwtToken(email); // bạn tự hiện thực hoặc gọi API
