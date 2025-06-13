@@ -50,6 +50,7 @@ public class AuthService {
     }
 
     public ResponseEntity<?> login(AuthRequest req) {
+        req.pwd_hash = passwordEncoder.encode(req.pwd_hash);
         String resp = rabbitMQProducer.getUser(req);
 
         UserPayload user;
