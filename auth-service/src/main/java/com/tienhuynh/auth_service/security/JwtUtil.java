@@ -104,7 +104,7 @@ public class JwtUtil {
         return false;
     }
 
-    public String getEmailFromToken(String token) {
+    public String getMailFromToken(String token) {
         return getClaims(token).getSubject();
     }
 

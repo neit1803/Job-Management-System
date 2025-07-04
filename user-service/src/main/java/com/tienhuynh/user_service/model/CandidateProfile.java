@@ -24,7 +24,7 @@ public class CandidateProfile {
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "uid", unique = true,  nullable = false)
+    @JoinColumn(name = "uid", unique = true)
     private User user;
 
     private String resume_url;

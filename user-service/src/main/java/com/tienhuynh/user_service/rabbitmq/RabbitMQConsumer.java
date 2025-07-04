@@ -2,6 +2,7 @@ package com.tienhuynh.user_service.rabbitmq;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tienhuynh.user_service.dto.UserDto;
 import com.tienhuynh.user_service.enums.Role;
 import com.tienhuynh.user_service.model.CandidateProfile;
 import com.tienhuynh.user_service.model.RecruiterProfile;
@@ -14,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RabbitMQConsumer {
+public class    RabbitMQConsumer {
     @Autowired
     UserServiceImpl userService;
 
@@ -30,15 +31,21 @@ public class RabbitMQConsumer {
             user.setRole(Role.valueOf(request.getRole().toUpperCase()));
 
             if (user.getRole() == Role.RECRUITER) {
-                RecruiterProfile profile = jsonObjectMapper.convertValue(request.getProfile(), RecruiterProfile.class);
+                RecruiterProfile profile = new RecruiterProfile();
+                if (!request.getProfile().isEmpty()) {
+                    profile = jsonObjectMapper.convertValue(request.getProfile(), RecruiterProfile.class);
+                }
                 profile.setUser(user);
                 user.setRecruiterProfile(profile);
             } else if (user.getRole() == Role.CANDIDATE) {
-                CandidateProfile profile = jsonObjectMapper.convertValue(request.getProfile(), CandidateProfile.class);
+                CandidateProfile profile = new CandidateProfile();
+                if (!request.getProfile().isEmpty()) {
+                    profile = jsonObjectMapper.convertValue(request.getProfile(), CandidateProfile.class);
+                }
                 profile.setUser(user);
                 user.setCandidateProfile(profile);
             }
-            userService.save(user).toString();
+            userService.save(user);
             return "SUCCESS";
 
         } catch (Exception e) {
@@ -49,13 +56,21 @@ public class RabbitMQConsumer {
 
 
     @RabbitListener(queues = "user.get.request.queue")
-    public String handleGetUserRequest(String msg){
+    public String handleGetUserRequest(String mail){
         try {
-            User user = jsonObjectMapper.readValue(msg, User.class);
-            User found = userService.getUserByMail(user.getMail());
+            User found = userService.getUserByMail(mail);
             return jsonObjectMapper.writeValueAsString(found);
         } catch (Exception e) {
-            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
+        }
+    }
+
+    @RabbitListener(queues = "user.update.request.queue")
+    public String handleUpdateUserRequest(String msg) {
+        try {
+            System.out.println(msg);
+            return "jsonObjectMapper.writeValueAsString(found)";
+        } catch (Exception e) {
             return "ERROR: " + e.getMessage();
         }
     }

@@ -38,10 +38,12 @@ public class User {
     @Column(nullable = false, unique = true)
     private String mail;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true, unique = true)
     private String phone;
 
     private String address;
+
+    private String sub;
 
     private boolean gender = true;
 

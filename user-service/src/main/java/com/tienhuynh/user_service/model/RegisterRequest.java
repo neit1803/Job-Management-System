@@ -34,5 +34,7 @@ public class RegisterRequest {
 
     public String address;
 
+    public String sub;
+
     public Map<String,Object> profile;
 }

@@ -23,6 +23,8 @@ public class UserDto <T extends UserProfileDto>{
 
     private String address;
 
+    private String sub;
+
     private Role role;
 
     private T profile;

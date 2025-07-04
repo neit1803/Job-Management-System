@@ -73,6 +73,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDto getUserBySub(String sub) {
+        User user = userRepository.findBySub(sub);
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        return mapper.apply(user);
+    }
+
+    @Override
     @Scheduled(cron = "0 0 3 * * ?") // chạy hàng ngày lúc 3h sáng
     public void cleanExpiredUsers() {
         userRepository.deleteAllByIsVerifiedAndCreatedAtBefore(RegisterStatus.EXPIRED, LocalDateTime.now().minusDays(3));

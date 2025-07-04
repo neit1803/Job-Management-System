@@ -2,6 +2,7 @@ package com.tienhuynh.auth_service.rabbitmq;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tienhuynh.auth_service.dto.UserDTO;
 import com.tienhuynh.auth_service.payload.AuthRequest;
 import com.tienhuynh.auth_service.payload.RegisterRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -35,16 +36,24 @@ public class RabbitMQProducer   {
         }
     }
 
-    public String getUser(AuthRequest req) {
+    public String getUser(String mail) {
+        return (String) rabbitTemplate.convertSendAndReceive(
+                RabbitMQConfig.USER_EXCHANGE,
+                RabbitMQConfig.USER_GET_ROUTING_KEY,
+                mail
+        );
+    }
+
+    public String updateUser(UserDTO req) {
         try {
             String json = jsonObjectMapper.writeValueAsString(req);
-            return (String) rabbitTemplate.convertSendAndReceive(
+            System.out.println(req.toString());
+            return (String)  rabbitTemplate.convertSendAndReceive(
                     RabbitMQConfig.USER_EXCHANGE,
-                    RabbitMQConfig.USER_GET_ROUTING_KEY,
+                    RabbitMQConfig.USER_UPDATE_ROUTING_KEY,
                     json
             );
         } catch (JsonProcessingException e) {
-            log.error("Error serializing AuthRequest object", e);
             return e.getMessage();
         }
     }

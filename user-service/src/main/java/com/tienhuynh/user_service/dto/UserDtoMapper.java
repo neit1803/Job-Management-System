@@ -30,6 +30,7 @@ public class UserDtoMapper implements Function<User, UserDto<? extends UserProfi
                 user.getMail(),
                 user.getPhone(),
                 user.getAddress(),
+                user.getSub(),
                 user.getRole(),
                 profileDto
         );

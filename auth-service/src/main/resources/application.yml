@@ -28,7 +28,7 @@ spring:
           google:
             client-id: 1071147330724-mn4qm6rr76enen1sou5nuh5mnnp9f7c5.apps.googleusercontent.com
             client-secret: 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
-            redirect-uri: "{baseUrl}/login/oauth2/code/google"
+            redirect-uri: "http://localhost:3000/oauth2/callback/code/google"
             scope:
               - openid
               - profile
@@ -36,7 +36,7 @@ spring:
           facebook:
             client-id: 1628784357677864
             client-secret: 383388b3a71c62bb21f2d609b179d386
-            redirect-uri: "{baseUrl}/login/oauth2/code/facebook"
+            redirect-uri: "http://localhost:3000/oauth2/callback/code/facebook"
             scope:
               - email
               - public_profile

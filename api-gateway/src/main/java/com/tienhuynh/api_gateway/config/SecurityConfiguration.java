@@ -18,8 +18,7 @@ public class SecurityConfiguration {
             "/auth/login/**",
             "/auth/register",
             "/users/**",
-            "/",
-            "/login/oauth2/code/**"
+            "/auth/oauth2/**",
     };
 
     @Bean

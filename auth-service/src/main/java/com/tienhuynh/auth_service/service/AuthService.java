@@ -41,25 +41,27 @@ public class AuthService {
         return authHeader.substring(7).trim();
     }
 
-    private String validateAndExtractEmailFromRefreshToken(String token) {
+    private String validateAndExtractMailFromRefreshToken(String token) {
         try {
-            return jwtUtil.getEmailFromToken(token);
+            return jwtUtil.getMailFromToken(token);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or malformed token");
         }
     }
 
     public ResponseEntity<?> login(AuthRequest req) {
-        req.pwd_hash = passwordEncoder.encode(req.pwd_hash);
-        String resp = rabbitMQProducer.getUser(req);
+        String resp = rabbitMQProducer.getUser(req.getMail());
 
         UserPayload user;
         try {
             user = jsonObjectMapper.readValue(resp, UserPayload.class);
+            if (passwordEncoder.matches(req.pwd_hash, user.getPwd_Hash())){
+                return ResponseEntity.ok(generateToken(user.getMail(), user.getRole(), "Successfully logged in"));
+            }
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Invalid response from user service: " + e.getMessage());
         }
-        return ResponseEntity.ok(generateToken(user.getMail(), user.getRole(), "Successfully logged in"));
+        return ResponseEntity.badRequest().body("Invalid password");
     }
 
     public ResponseEntity<?> register(RegisterRequest req) {
@@ -73,7 +75,7 @@ public class AuthService {
 
     public ResponseEntity<?> logout(String authHeader) {
         String token = extractToken(authHeader);
-        String email = validateAndExtractEmailFromRefreshToken(token);
+        String email = validateAndExtractMailFromRefreshToken(token);
 
         String key = "refresh_token:" + email;
         Object storedTokenObj = redisService.getValue(key);
@@ -105,14 +107,14 @@ public class AuthService {
 
     public ResponseEntity<?> getEmailFromToken(String authHeader) {
         String token = extractToken(authHeader);
-        String email;
+        String mail;
         try {
-            email = jwtUtil.getEmailFromToken(token);
+            mail = jwtUtil.getMailFromToken(token);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid or malformed token");
         }
 
-        String resp = rabbitMQProducer.getUser(new AuthRequest(email, ""));
+        String resp = rabbitMQProducer.getUser(mail);
         UserDTO user;
         try {
             user = jsonObjectMapper.readValue(resp, UserDTO.class);
@@ -125,10 +127,10 @@ public class AuthService {
 
     public ResponseEntity<?> refreshToken(String authHeader) {
         String token = extractToken(authHeader);
-        String email = validateAndExtractEmailFromRefreshToken(token);
+        String mail = validateAndExtractMailFromRefreshToken(token);
 
         // Lấy user từ User-Service qua RabbitMQ
-        String response = rabbitMQProducer.getUser(new AuthRequest(email, ""));
+        String response = rabbitMQProducer.getUser(mail);
         UserDTO user;
         try {
             user = jsonObjectMapper.readValue(response, UserDTO.class);
@@ -142,7 +144,7 @@ public class AuthService {
                 token,
                 "Bearer",
                 jwtUtil.ACCESS_TOKEN_EXPIRE_MILLISECOND,
-                "Successfully refreshed token for " + email
+                "Successfully refreshed token for " + mail
         ));
     }
 }

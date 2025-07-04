@@ -24,4 +24,6 @@ public class UserDTO implements Serializable {
     private String phone;
 
     private String role;
+
+    private String sub;
 }

@@ -26,14 +26,14 @@ public class RecruiterProfile {
 
     @OneToOne
     @MapsId
-    @JoinColumn(name = "uid",   unique = true,  nullable = false)
+    @JoinColumn(name = "uid",   unique = true)
     private User user;
 
-    @Column(name = "tax_code", nullable = false, unique = true)
-    private String taxCode;
+    @Column(name = "tax_code", unique = true)
+    private String taxCode = "";
 
     @Column(nullable = false, unique = true)
-    private String website;
+    private String website = "";
 
-    private String description;
+    private String description = "";
 }
