@@ -30,8 +30,8 @@ public class UserController {
         return ResponseEntity.ok(userService.save(user));
     }
 
-    @PatchMapping
+    @PatchMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(@PathVariable String id, @RequestBody User user) {
-        return ResponseEntity.ok(userService.update(UUID.fromString(id), user));
+        return ResponseEntity.ok(userService.update(user));
     }
 }

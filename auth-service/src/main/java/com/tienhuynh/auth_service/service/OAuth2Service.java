@@ -1,7 +1,7 @@
 package com.tienhuynh.auth_service.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tienhuynh.auth_service.controller.OAuth2Request;
+import com.tienhuynh.auth_service.payload.OAuth2Request;
 import com.tienhuynh.auth_service.dto.UserDTO;
 import com.tienhuynh.auth_service.oauth2.FacebookRegistryProperties;
 import com.tienhuynh.auth_service.oauth2.GoogleRegistryProperties;
@@ -61,40 +61,56 @@ public class OAuth2Service {
     }
 
     public ResponseEntity<?> handleProviderCallBack(OAuth2Request req) {
-        req.setLoginType(req.getLoginType().toLowerCase().trim());
         RegisterRequest metaData = fetchUserInfo(req);
 
         if (metaData == null) {
             return ResponseEntity.badRequest().body("Failed to authenticate user info.");
         }
 
+        req.setLoginType(req.getLoginType().toLowerCase().trim());
         metaData.setRole(req.getRole());
 
-        // Kiểm tra user đã tồn tại hay chưa
-        try {
-            String resp = rabbitMQProducer.getUser(metaData.getMail());
-            UserDTO user = jsonObjectMapper.readValue(resp, UserDTO.class);
+        // Gọi User-Service để check user theo email
+        String foundUserJson = rabbitMQProducer.getUser(metaData.getMail());
 
-            if (user.getSub() == null || user.getSub().isEmpty()) {
-                user.setSub(metaData.getSub());
-                ResponseEntity.ok(rabbitMQProducer.updateUser(user));
+        // ✅ Nếu user tồn tại
+        if (!foundUserJson.equals("ERROR: User not found")) {
+            try {
+                UserDTO user = jsonObjectMapper.readValue(foundUserJson, UserDTO.class);
+
+                // Nếu chưa gán sub trước đó → gán lần đầu
+                if (user.getSub() == null || user.getSub().isEmpty()) {
+                    user.setSub(metaData.getSub());
+                    String updateResp = rabbitMQProducer.updateUser(user);
+                    if (!"SUCCESSFULLY UPDATED".equals(updateResp)) {
+                        return ResponseEntity.badRequest().body(updateResp);
+                    }
+                }
+
+                // Nếu sub không khớp → từ chối
+                if (!user.getSub().equals(metaData.getSub())) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT)
+                            .body("This email has already been used. Please log in using the originally linked provider.");
+                }
+
+                // Đúng sub → login thành công
+                return ResponseEntity.ok(authService.generateToken(
+                        user.getMail(), user.getRole(), "Successfully logged in"
+                ));
+
+            } catch (Exception ex) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to parse user info.");
             }
-
-            // Nếu sub khác → từ chối
-            if (!user.getSub().equals(metaData.getSub())) {
-                return ResponseEntity.status(HttpStatus.CONFLICT)
-                        .body("This email has already been used. Please log in using the originally linked provider.");
-            }
-
-            // Nếu sub trùng → OK
-            return ResponseEntity.ok(authService.generateToken(user.getMail(), user.getRole(), "Successfully logged in"));
-        } catch (Exception e) {
-            // User chưa tồn tại → tạo mới + cấp token
-            metaData.setPwd_hash("Password123@");
-            metaData.setProfile(new HashMap());
-            return ResponseEntity.ok(authService.register(metaData));
         }
+
+        // User chưa tồn tại → tạo mới
+        metaData.setPwd_hash("Password123@");
+        metaData.setProfile(new HashMap<>());
+        metaData.setVerified_status("VERIFIED");
+        return ResponseEntity.ok(authService.register(metaData));
     }
+
 
     private RegisterRequest fetchUserInfo(OAuth2Request req) {
         String clientId = "";

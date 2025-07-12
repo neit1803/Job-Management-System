@@ -11,8 +11,8 @@ public enum RegisterStatus {
     BLACKLISTED;
 
     @JsonCreator
-    public static Role fromString(String value) {
-        return Role.valueOf(value.toUpperCase());
+    public static RegisterStatus fromString(String value) {
+        return RegisterStatus.valueOf(value.toUpperCase());
     }
 
     @JsonValue

@@ -26,4 +26,9 @@ public class UserDTO implements Serializable {
     private String role;
 
     private String sub;
+
+    @Column(name = "verified_status")
+    private String verifiedStatus;
+
+    private boolean male;
 }

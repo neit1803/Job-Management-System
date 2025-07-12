@@ -1,5 +1,6 @@
 package com.tienhuynh.auth_service.controller;
 
+import com.tienhuynh.auth_service.payload.OAuth2Request;
 import com.tienhuynh.auth_service.service.OAuth2Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

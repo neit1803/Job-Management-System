@@ -57,33 +57,55 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto update(UUID id, User user) {
-        return userRepository.
-                findById(id)
-                .map(mapper)
+    public UserDto update(User user) {
+        User existingUser = userRepository.findById(user.getId())
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-    }
 
-    @Override
-    public UserDto changePassword(UUID id, String password) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
-        user.setPwdHash(password);
-        userRepository.save(user);
-        return mapper.apply(user);
-    }
-
-    @Override
-    public UserDto getUserBySub(String sub) {
-        User user = userRepository.findBySub(sub);
-        if (user == null) {
-            throw new UserNotFoundException("User not found");
+        // Chỉ cập nhật các field cho phép
+        if (user.getFullName() != null) {
+            existingUser.setFullName(user.getFullName());
         }
-        return mapper.apply(user);
+
+        if (user.getPwdHash() != null) {
+            existingUser.setPwdHash(user.getPwdHash());
+        }
+
+        if (user.getAddress() != null) {
+            existingUser.setAddress(user.getAddress());
+        }
+
+        if (user.getPhone() != null) {
+            existingUser.setPhone(user.getPhone());
+        }
+
+        if (user.getSub() != null) {
+            existingUser.setSub(user.getSub());
+        }
+
+        if (user.getRole() != null) {
+            existingUser.setRole(user.getRole());
+        }
+
+        if (user.getVerifiedStatus() != null) {
+            existingUser.setVerifiedStatus(user.getVerifiedStatus());
+        }
+
+        // Gender là boolean primitive (default = false), nên kiểm tra rõ ràng
+        existingUser.setMale(user.isMale());
+
+        // Cập nhật thời gian
+        existingUser.setUpdatedAt(LocalDateTime.now());
+
+        // Lưu lại
+        User updatedUser = userRepository.save(existingUser);
+
+        // Trả về DTO
+        return mapper.apply(updatedUser);
     }
 
     @Override
     @Scheduled(cron = "0 0 3 * * ?") // chạy hàng ngày lúc 3h sáng
     public void cleanExpiredUsers() {
-        userRepository.deleteAllByIsVerifiedAndCreatedAtBefore(RegisterStatus.EXPIRED, LocalDateTime.now().minusDays(3));
+//        userRepository.deleteAllByIsVerifiedAndCreatedAtBefore(RegisterStatus.EXPIRED, LocalDateTime.now().minusDays(3));
     }
 }

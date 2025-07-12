@@ -40,5 +40,9 @@ public class RegisterRequest {
 
     public String sub =  "";
 
+    public String verified_status = "PENDING_VERIFICATION";
+
+    public boolean male = true;
+
     public Map<String,Object> profile;
 }

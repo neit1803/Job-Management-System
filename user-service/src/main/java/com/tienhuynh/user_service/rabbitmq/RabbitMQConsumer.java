@@ -1,14 +1,12 @@
 package com.tienhuynh.user_service.rabbitmq;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tienhuynh.user_service.dto.UserDto;
+import com.tienhuynh.user_service.enums.RegisterStatus;
 import com.tienhuynh.user_service.enums.Role;
 import com.tienhuynh.user_service.model.CandidateProfile;
 import com.tienhuynh.user_service.model.RecruiterProfile;
 import com.tienhuynh.user_service.model.RegisterRequest;
 import com.tienhuynh.user_service.model.User;
-import com.tienhuynh.user_service.payload.CommonResponse;
 import com.tienhuynh.user_service.service.UserServiceImpl;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +26,9 @@ public class    RabbitMQConsumer {
             RegisterRequest request = jsonObjectMapper.readValue(msg, RegisterRequest.class);
 
             User user = jsonObjectMapper.convertValue(request, User.class);
-            user.setRole(Role.valueOf(request.getRole().toUpperCase()));
+            user.setRole(Role.fromString(request.getRole()));
+
+            user.setVerifiedStatus(RegisterStatus.fromString(request.getVerified_status()));
 
             if (user.getRole() == Role.RECRUITER) {
                 RecruiterProfile profile = new RecruiterProfile();
@@ -46,7 +46,7 @@ public class    RabbitMQConsumer {
                 user.setCandidateProfile(profile);
             }
             userService.save(user);
-            return "SUCCESS";
+            return "SUCCESSFULLY REGISTERED";
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -67,9 +67,11 @@ public class    RabbitMQConsumer {
 
     @RabbitListener(queues = "user.update.request.queue")
     public String handleUpdateUserRequest(String msg) {
+        System.out.println("Updating process: " + msg);
         try {
-            System.out.println(msg);
-            return "jsonObjectMapper.writeValueAsString(found)";
+            User request = jsonObjectMapper.readValue(msg, User.class);
+            System.out.println(userService.update(request).toString());
+            return "SUCCESSFULLY UPDATED";
         } catch (Exception e) {
             return "ERROR: " + e.getMessage();
         }

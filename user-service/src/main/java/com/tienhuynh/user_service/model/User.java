@@ -45,11 +45,11 @@ public class User {
 
     private String sub;
 
-    private boolean gender = true;
+    private boolean male = true;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "is_verified", nullable = false)
-    private RegisterStatus isVerified = RegisterStatus.PENDING_VERIFICATION;
+    @Column(name = "verified_status", nullable = false)
+    private RegisterStatus verifiedStatus = RegisterStatus.PENDING_VERIFICATION;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

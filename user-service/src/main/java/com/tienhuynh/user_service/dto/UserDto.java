@@ -1,5 +1,6 @@
 package com.tienhuynh.user_service.dto;
 
+import com.tienhuynh.user_service.enums.RegisterStatus;
 import com.tienhuynh.user_service.enums.Role;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -26,6 +27,10 @@ public class UserDto <T extends UserProfileDto>{
     private String sub;
 
     private Role role;
+
+    private RegisterStatus verifiedStatus;
+
+    private boolean male;
 
     private T profile;
 }

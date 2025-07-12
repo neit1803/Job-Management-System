@@ -59,7 +59,7 @@ public class AuthService {
                 return ResponseEntity.ok(generateToken(user.getMail(), user.getRole(), "Successfully logged in"));
             }
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Invalid response from user service: " + e.getMessage());
+            return ResponseEntity.badRequest().body("Invalid mail");
         }
         return ResponseEntity.badRequest().body("Invalid password");
     }
@@ -67,7 +67,7 @@ public class AuthService {
     public ResponseEntity<?> register(RegisterRequest req) {
         req.pwd_hash = passwordEncoder.encode(req.pwd_hash);
         String resp = rabbitMQProducer.saveUser(req);
-        if (resp.equals("SUCCESS")) {
+        if (resp.equals("SUCCESSFULLY REGISTERED")) {
             return ResponseEntity.ok().body(generateToken(req.getMail(), req.getRole(),  "Successfully registered"));
         }
         return ResponseEntity.badRequest().body(resp);

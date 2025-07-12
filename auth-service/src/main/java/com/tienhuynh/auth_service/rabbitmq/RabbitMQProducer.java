@@ -47,7 +47,6 @@ public class RabbitMQProducer   {
     public String updateUser(UserDTO req) {
         try {
             String json = jsonObjectMapper.writeValueAsString(req);
-            System.out.println(req.toString());
             return (String)  rabbitTemplate.convertSendAndReceive(
                     RabbitMQConfig.USER_EXCHANGE,
                     RabbitMQConfig.USER_UPDATE_ROUTING_KEY,

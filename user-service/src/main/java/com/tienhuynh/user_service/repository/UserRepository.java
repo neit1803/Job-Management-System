@@ -12,7 +12,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     public User findByMail(String mail);
 
-    public User findBySub(String sub);
-
-    void deleteAllByIsVerifiedAndCreatedAtBefore(RegisterStatus registerStatus, LocalDateTime localDateTime);
+//    void deleteAllByIsVerifiedAndCreatedAtBefore(RegisterStatus registerStatus, LocalDateTime localDateTime);
 }

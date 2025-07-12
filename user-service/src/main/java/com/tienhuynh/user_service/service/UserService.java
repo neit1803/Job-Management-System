@@ -12,13 +12,9 @@ public interface UserService {
 
     UserDto save(User user);
 
-    UserDto update(UUID id, User user);
+    UserDto update(User user);
 
     User getUserByMail(String email);
-
-    UserDto getUserBySub(String sub);
-
-    UserDto changePassword(UUID id, String password);
 
     void cleanExpiredUsers();
 }
