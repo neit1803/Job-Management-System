@@ -55,13 +55,20 @@ public class AuthService {
         UserPayload user;
         try {
             user = jsonObjectMapper.readValue(resp, UserPayload.class);
-            if (passwordEncoder.matches(req.pwd_hash, user.getPwd_Hash())){
-                return ResponseEntity.ok(generateToken(user.getMail(), user.getRole(), "Successfully logged in"));
-            }
+            return switch (user.getStatus()) {
+                case "BLACKLISTED" ->
+                        throw new Exception("Account has been blocked");
+                case "VERIFIED" -> {
+                    if (passwordEncoder.matches(req.pwd_hash, user.getPwdHash())) {
+                        yield ResponseEntity.ok(generateToken(user.getMail(), user.getRole(), "Successfully logged in"));
+                    }
+                    yield ResponseEntity.badRequest().body("Invalid password");
+                }
+                default -> throw new Exception("Account haven't been verified");
+            };
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Invalid mail");
+            return ResponseEntity.badRequest().body("ERROR: " + e.getMessage());
         }
-        return ResponseEntity.badRequest().body("Invalid password");
     }
 
     public ResponseEntity<?> register(RegisterRequest req) {
@@ -87,6 +94,11 @@ public class AuthService {
 
         redisService.deleteValue(key);
         return ResponseEntity.ok("Successfully logged out " + email);
+    }
+
+    public ResponseEntity<?> changePwd(String authHeader) {
+        String token = extractToken(authHeader);
+        return ResponseEntity.ok(validateAndExtractMailFromRefreshToken(token));
     }
 
     public LoginResponse generateToken(String mail, String role, String msg) {

@@ -1,5 +1,6 @@
 package com.tienhuynh.auth_service.payload;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.persistence.Column;
@@ -18,13 +19,16 @@ public class UserPayload implements Serializable {
 
     private String mail;
 
-    @Column(name = "pwd_hash")
-    private String pwd_Hash;
+    @JsonProperty("pwd_hash")
+    private String pwdHash;
 
-    @Column(name = "full_name")
+    @JsonProperty("full_name")
     private String fullName;
 
     private String phone;
 
     private String role;
+
+    @JsonProperty("verified_status")
+    private String status;
 }

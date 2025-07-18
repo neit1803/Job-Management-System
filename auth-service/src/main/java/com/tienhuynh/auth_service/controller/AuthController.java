@@ -15,27 +15,37 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody AuthRequest req) {
+    public ResponseEntity<?> login(@RequestBody AuthRequest req) {
         return ResponseEntity.ok(authService.login(req));
     }
 
     @PostMapping("/register")
-    public ResponseEntity register(@Valid @RequestBody RegisterRequest req) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest req) {
         return ResponseEntity.ok(authService.register(req));
     }
 
+    @PostMapping("/change-pwd")
+    public ResponseEntity<?> changePwd() {
+        return ResponseEntity.ok("change pwd");
+    }
+
+    @PostMapping("/forgot-pwd")
+    public ResponseEntity<?> forgotPwd() {
+        return ResponseEntity.ok("forgot pwd");
+    }
+
     @GetMapping("/refresh-token")
-    public ResponseEntity refreshToken(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String authHeader) {
         return ResponseEntity.ok(authService.refreshToken(authHeader));
     }
 
     @GetMapping("/logout")
-    public ResponseEntity logout(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
         return ResponseEntity.ok(authService.logout(authHeader));
     }
 
     @GetMapping("/me")
-    public ResponseEntity getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
         return ResponseEntity.ok(authService.getEmailFromToken(authHeader));
     }
 }

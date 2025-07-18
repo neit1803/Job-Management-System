@@ -8,7 +8,7 @@ public enum RegisterStatus {
     VERIFIED,
     EXPIRED,
     FAILED,
-    BLACKLISTED;
+    BLACK_LISTED;
 
     @JsonCreator
     public static RegisterStatus fromString(String value) {
